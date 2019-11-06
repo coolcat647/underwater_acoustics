@@ -1,0 +1,9 @@
+<launch>
+    <!-- Setup file -->
+    <arg name="device" default="18i8" doc="The recording device which you are using. e.g. 18i8"/>
+
+    <!-- Acoustic sampling node -->
+    <node name="acoustic_sampling_node" pkg="acoustic_sampling" type="acoustic_sampling_node" output="screen" clear_params="true" required="true" args="num=1">
+        <rosparam command="load" file="$(find acoustic_sampling)/config/$(arg device).yaml" />
+    </node>
+</launch>

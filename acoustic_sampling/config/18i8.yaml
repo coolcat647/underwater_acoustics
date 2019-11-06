@@ -1,0 +1,7 @@
+DEVICE_NAME            : "Focusrite Scarlett 18i8 2nd"
+pcm_name               : "hw:1,0"
+pcm_frames             : 100
+pcm_sampleRate         : 192000
+pcm_available_channels : 10
+pcm_using_channels     : 4
+pcm_loops              : 0

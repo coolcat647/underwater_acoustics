@@ -1,0 +1,7 @@
+DEVICE_NAME            : "Focusrite Scarlett 2i2"
+pcm_name               : "hw:0,0"
+pcm_frames             : 100
+pcm_sampleRate         : 192000
+pcm_available_channels : 2
+pcm_using_channels     : 2
+pcm_loops              : 0
