@@ -1,0 +1,15 @@
+appTicks        : 0.25
+bits            : 32.0
+fs              : 192000.0
+soundSpeed      : 1500
+micToMic        : 1.623
+wimdowLen       : 0.5
+sen             : -208.0
+highPass        : 8000
+lowPass         : 12000
+angleLen        : 7
+meanTime        : 50
+doorDistance    : 15 
+doorWidth       : 40
+smallThreshold  : 130
+corrFlag        : False

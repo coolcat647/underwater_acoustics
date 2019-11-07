@@ -1,0 +1,5 @@
+duration_ms      : 50
+sound_freq       : 10000
+
+# The play_freq must to be smaller than 1 / (duration_ms/1000). 
+play_freq        : 0.5

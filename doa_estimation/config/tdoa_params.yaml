@@ -1,0 +1,15 @@
+appTicks   : 0.5
+bits       : 32.0
+fs         : 192000.0
+soundSpeed : 1500.0
+boatToMic  : 1.1 
+x          : 0.0
+y          : 0.0
+heading    : 0.0
+sen        : -208.0
+maxSel     : 150.0
+filter     : "false"
+highpass   : 1
+lowpass    : 20000
+filterorder: 5
+use2Mic    : "true"
