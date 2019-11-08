@@ -3,21 +3,23 @@
 import rospy
 import rospkg
 import os
+import sys
 import time
 import signal
 import subprocess
-from pinger_ctrl.srv import PingerTrigger, PingerTriggerResponse
+from acoustic_source_control.srv import PingerTrigger, PingerTriggerResponse
 # For Rpi3 relay controll
 if os.uname()[4] == 'armv7l':
     import RPi.GPIO as GPIO
     GPIO.setmode(GPIO.BOARD)
+    GPIO.setwarnings(False)
 
 
 class Pinger(object):
     def __init__(self, node_name, duration_ms=50, sound_freq=15000, play_freq=0.5):
         self.srv = rospy.Service(node_name, PingerTrigger, self.sound_handler)
         rospack = rospkg.RosPack()
-        self.pack_path = rospack.get_path('pinger_ctrl')
+        self.pack_path = rospack.get_path('acoustic_source_control')
         self.cmd = ''
         self.process = None             # declare for playsound process handler
 
