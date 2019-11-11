@@ -3,7 +3,7 @@
 	<arg name="yaml_file" default="pinger_params"/>
 
 	<!-- Pinger2 -->
-    <node name="pinger2" pkg="acoustic_source_control" type="pinger.py" output="screen" clear_params="true" required="true" args="num=2">
+    <node name="pinger2_node" pkg="acoustic_source_control" type="pinger.py" output="screen" clear_params="true" required="true" args="pinger_num=2">
     	<rosparam command="load" file="$(find acoustic_source_control)/config/$(arg yaml_file).yaml" />
     </node>
 </launch>
