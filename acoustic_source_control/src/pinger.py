@@ -7,7 +7,6 @@ import sys
 import time
 import signal
 import subprocess
-from acoustic_source_control.srv import PingerTrigger, PingerTriggerResponse
 from std_srvs.srv import Trigger, TriggerResponse
 
 # Import GPIO package for Rpi3 relay control
