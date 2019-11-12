@@ -11,7 +11,6 @@ find_package(catkin REQUIRED COMPONENTS
   robotx_msgs
   roscpp
   rospy
-  message_generation
   std_msgs
   std_srvs
 )
@@ -57,10 +56,10 @@ find_package(catkin REQUIRED COMPONENTS
 # )
 
 ## Generate services in the 'srv' folder
-add_service_files(
-  FILES
-  PingerTrigger.srv
-)
+# add_service_files(
+#   FILES
+#   PingerTrigger.srv
+# )
 
 ## Generate actions in the 'action' folder
 # add_action_files(

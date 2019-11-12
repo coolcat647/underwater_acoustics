@@ -1,9 +1,0 @@
-# on  <- on_off=1
-# off <- on_off=0
-# one_shot  <- one_shot=1
-# repeat    <- one_shot=0
-int8 on_off      
-int8 one_shot
----
-# return pinger state
-string ret_pinger_state

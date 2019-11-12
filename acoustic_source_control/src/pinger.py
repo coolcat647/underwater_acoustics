@@ -8,12 +8,15 @@ import time
 import signal
 import subprocess
 from acoustic_source_control.srv import PingerTrigger, PingerTriggerResponse
+from std_srvs.srv import Trigger, TriggerResponse
+
 # Import GPIO package for Rpi3 relay control
 if 'arm' in os.uname()[-1]:
     import RPi.GPIO as GPIO
     GPIO.setwarnings(False) 
     GPIO.setmode(GPIO.BOARD)
     GPIO_PIN_RELAY = 7
+    GPIO.setup(GPIO_PIN_RELAY, GPIO.OUT, initial = GPIO.LOW)
 
 COLOR_NC='\033[0m'
 COLOR_GREEN='\033[0;32m'
@@ -32,11 +35,12 @@ class PingerNode(object):
         self.sound_freq = rospy.get_param('~sound_freq', sound_freq)
         self.play_freq = rospy.get_param('~play_freq', play_freq)
 
-        # For Rpi3 relay control
-        if self.is_rpi: GPIO.setup(GPIO_PIN_RELAY, GPIO.OUT, initial = GPIO.LOW)
+        # For Rpi3 relay control -> turn on amplifier
+        if self.is_rpi: 
+            GPIO.output(GPIO_PIN_RELAY, GPIO.HIGH) 
 
         # ROS service
-        self.srv = rospy.Service(node_name, PingerTrigger, self.sound_cb)
+        self.srv = rospy.Service(node_name, Trigger, self.sound_cb)
 
         rospy.on_shutdown(self.onShutdown)
         rospy.loginfo('{}{} is waiting for request{}'.format(COLOR_GREEN, rospy.get_name(), COLOR_NC))
@@ -52,38 +56,30 @@ class PingerNode(object):
             if self.process != None:
                 os.killpg(os.getpgid(self.process.pid), signal.SIGTERM)    
                 rospy.loginfo("stop %s " % rospy.get_name()) 
-                self.process = None
-                # Rpi3 # Turn off the relay
-                if self.is_rpi: GPIO.output(GPIO_PIN_RELAY, GPIO.LOW) 
+                self.process = None   
 
             # The pinger will just play one time in one_shot mode
-            self.cmd = 'python %s/src/sine_generator.py %s %s %s %s' % \
-                (self.pack_path, self.duration_ms, self.sound_freq, self.play_freq, req.one_shot)
-            
-            if req.on_off != 0:
+            self.cmd = 'python %s/src/sine_generator.py %s %s %s 0' % \
+                (self.pack_path, self.duration_ms, self.sound_freq, self.play_freq)
+
+            if not self.is_busy:
+                self.is_busy = True
                 rospy.loginfo("Output freqency of %s = %d Hz with %d ms and %d ms silence" % \
                     (rospy.get_name(), self.sound_freq, self.duration_ms, 1000 / self.play_freq - self.duration_ms))
-
-                # Rpi3 relay control and countdown 5 seconds to turn on the amplifier
-                if self.is_rpi:   
-                    GPIO.output(GPIO_PIN_RELAY, GPIO.HIGH)   
-                    for cnt in range(5, 0, -1):
-                        rospy.loginfo('Waitting for amplifier ready in %d sec...' % cnt)
-                        time.sleep(1)
                 
                 # Open the subprocess
                 self.process = subprocess.Popen(self.cmd, stdout= subprocess.PIPE, shell=True, preexec_fn=os.setsid)
-                return PingerTriggerResponse('playing the sound...')
+                return TriggerResponse(message='{} turn on.'.format(rospy.get_name()))
 
         except OSError as e:
             print "OSError > ", e.errno
             print "OSError > ", e.strerror
             print "OSError > ", e.filename
             exit(-1)
-        # except:
-        #     print "Error > ",sys.exc_info()[0]
-        #     exit(-1)
-        return PingerTriggerResponse('[%s] stop...' % rospy.get_name())
+        except:
+            print "Error > ",sys.exc_info()[0]
+            exit(-1)
+        return TriggerResponse(message='{} stop...'.format(rospy.get_name()))
 
     def onShutdown(self):
         # This program must get here after killing the ROS node
