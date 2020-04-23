@@ -7,7 +7,7 @@ import rospy
 from scipy import signal as sg
 from robotx_msgs.msg import HydrophoneData
 from numpy.fft import irfft, rfft 
-from task2.srv import *
+from doa_estimation.srv import *
 import boatStatus
 
 class TDOA(object):
@@ -15,7 +15,7 @@ class TDOA(object):
         self.ticks = 0.5
         self.bits = 32.0
         self.fs = 192000
-        self.c = 340.0
+        self.c = 1500.0
         self.boat_mic = 1.0
         self.window_time = 1.5
         self.window = self.fs*self.window_time
@@ -47,10 +47,10 @@ class TDOA(object):
         self.m2 = boatStatus.micPosition(int(self.window))
 
         #Iterate Function
-        #rospy.Timer(rospy.Duration(self.ticks), self.run)
+        rospy.Timer(rospy.Duration(self.ticks), self.Iterate)
 
         #Publisher
-        #self.pub_xxx = rospy.Publisher("Angle", Float64, queue_size=1)
+        self.pub_xxx = rospy.Publisher("Angle", Float64, queue_size=1)
 
         #Subscriber
         self.sub_data = rospy.Subscriber("hydrophone_data", HydrophoneData, self.receiveMicData, queue_size=1)
@@ -146,7 +146,6 @@ class TDOA(object):
                     # Declare the service response object
                     resp = AngleEstimationResponse()
                     resp.angle = np.median(self.angle_buffer)
-                    resp.process_state = 0;
                     self.angle_buffer = np.array([])
                     return resp
 

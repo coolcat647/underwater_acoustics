@@ -13,20 +13,20 @@ import boatStatus
 class TDOA(object):
     def __init__(self):
         self.ticks = 0.5
-        self.bits = 16.0
+        self.bits = 32.0
         self.fs = 192000
         self.c = 1500.0
         self.boat_mic = 1.0
         self.window_time = 1.5
-        self.window = self.fs*self.window_time
+        self.window = self.fs * self.window_time
         self.px = 0
         self.py = -70
         self.heading = 0
         self.index_tdoa = 0
         # filter params
         self.filterIndex = False
-        self.filterLowPassCutoff = 40500
-        self.filterHighPassCutoff = 1000
+        self.filterLowPassCutoff = 45000
+        self.filterHighPassCutoff = 8000
         self.filterOrder = 5
         self.twoMicIndex = True
 

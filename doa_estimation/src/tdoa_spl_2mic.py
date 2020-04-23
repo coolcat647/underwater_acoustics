@@ -11,7 +11,7 @@ from std_msgs.msg import Int32MultiArray, Float32, Bool
 from robotx_msgs.msg import HydrophoneData
 from robotx_msgs.msg import RealTimeData
 # Import custom service package
-from task2.srv import *
+from doa_estimation.srv import *
 
 import boatStatus
 from toolbox_pkg import tool_box_tdoa
@@ -111,7 +111,6 @@ class TDOA_spl(object):
                 # 'AngleEstimationResponse()' is created by catkin_make the the same as 'AngleEstimation' object
                 resp = AngleEstimationResponse()
                 resp.angle = np.median(self.angle_buffer)
-                resp.process_state = 0;
                 self.angle_buffer = np.array([])
                 break
         self.startIndex = False

@@ -2,7 +2,7 @@
 <launch>
     <arg name="yaml_file" default="tdoa_params"/>
 
-    <node name="tdoa_2mic" pkg="doa_estimation" type="tdoa_2mic.py" output="screen" clear_params="true" required="true">
+    <node name="tdoa_3mic" pkg="doa_estimation" type="tdoa_3mic.py" output="screen" clear_params="true" required="true">
         <rosparam command="load" file="$(find doa_estimation)/config/$(arg yaml_file).yaml" />
     </node>
 </launch>

@@ -13,7 +13,7 @@ from robotx_msgs.msg import RealTimeData
 
 import boatStatus
 from toolbox_pkg import tool_box_tdoa
-from task2.srv import *
+from doa_estimation.srv import *
 
 CONFIG_ROSSERVICE_VERS = False
 
@@ -70,7 +70,7 @@ class TDOA_spl(object):
         else:
             #Publisher
             self.pub_angle          = rospy.Publisher("guess_angle", Float32, queue_size=1)
-            self.pub_real_data = rospy.Publisher("acoustic_real_data", RealTimeData, queue_size=1)
+            # self.pub_real_data = rospy.Publisher("acoustic_real_data", RealTimeData, queue_size=1)
             self.startIndex = True
 
 
@@ -125,7 +125,6 @@ class TDOA_spl(object):
                 # 'AngleEstimationResponse()' is created by catkin_make the the same as 'AngleEstimation' object
                 resp = AngleEstimationResponse()
                 resp.angle = np.median(self.angle_buffer)
-                resp.process_state = 0;
                 self.angle_buffer = np.array([])
                 break
         self.startIndex = False
@@ -213,7 +212,7 @@ class TDOA_spl(object):
         self.SaveMsg.data_ch2 = input_data_c2.tolist()
         self.SaveMsg.fs = fs 
         self.SaveMsg.angle = angle
-        self.pub_real_data.publish(self.SaveMsg)
+        # self.pub_real_data.publish(self.SaveMsg)
 
     def findDiffT(self, inputData1, inputData2, maxDt):
         abs_inputData1 = np.absolute(inputData1)

@@ -1,7 +1,0 @@
-<launch>
-    <arg name="yaml_file" default="tdoa_spl_params"/>
-
-    <node name="tdoa_spl" pkg="task2" type="tdoa_spl.py" output="screen" clear_params="true" required="true">
-        <rosparam command="load" file="$(find task2)/config/$(arg yaml_file).yaml" />
-    </node>
-</launch>

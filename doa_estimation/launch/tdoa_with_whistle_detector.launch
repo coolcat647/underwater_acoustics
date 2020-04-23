@@ -1,7 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <launch>
     <arg name="yaml_file" default="tdoa_with_whistle_detector_params"/>
 
-    <node name="tdoa" pkg="task2" type="tdoa_with_whistle_detector.py" output="screen" clear_params="true" required="true">
-        <rosparam command="load" file="$(find task2)/config/$(arg yaml_file).yaml" />
+    <node name="tdoa" pkg="doa_estimation" type="tdoa_with_whistle_detector.py" output="screen" clear_params="true" required="true">
+        <rosparam command="load" file="$(find doa_estimation)/config/$(arg yaml_file).yaml" />
     </node>
 </launch>
