@@ -1,9 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <launch>
     <!-- Setup file -->
     <arg name="device" default="18i8" doc="The recording device which you are using. e.g. 18i8"/>
+    <arg name="pcm_id" doc="please type 'arecord -l' to check your pcm device ID, 
+        then assign your pcm device, e.g: hw:2,0" />
 
     <!-- Acoustic sampling node -->
-    <node name="acoustic_sampling_node" pkg="acoustic_sampling" type="acoustic_sampling_node" output="screen" clear_params="true" required="true" args="num=1">
+    <node name="acoustic_sampling_node" pkg="acoustic_sampling" type="acoustic_sampling_node" output="screen" clear_params="true" required="true">
         <rosparam command="load" file="$(find acoustic_sampling)/config/$(arg device).yaml" />
+        <param name="pcm_id" type="str" value="$(arg pcm_id)" />
     </node>
 </launch>

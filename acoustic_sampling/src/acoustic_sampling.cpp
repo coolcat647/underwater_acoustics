@@ -23,6 +23,7 @@ static const string COLOR_RED = "\e[0;31m";
 static const string COLOR_GREEN = "\e[0;32m";
 static const string COLOR_YELLOW = "\e[0;33m"; 
 static const string COLOR_NC = "\e[0m";
+static const string PCM_ERR_MSG = "rosparam \"pcm_id\" is not found, please type \"arecord -l\" to check your pcm device ID,\r\nthen assign your pcm device. e,g: \"hw:2,0\"";
 
 class RecorderNode {
     public:
@@ -41,7 +42,7 @@ class RecorderNode {
 
         // Recorder parameter
         string DEVICE_NAME_;
-        string pcm_name_;
+        string pcm_id_;
         snd_pcm_t *pcm_handle_;
         snd_pcm_hw_params_t *pcm_params_;
         snd_pcm_uframes_t pcm_frames_;
@@ -65,8 +66,11 @@ RecorderNode::RecorderNode() {
     // Import parameter from yaml file
     if (!ros::param::get("~DEVICE_NAME", DEVICE_NAME_))
         DEVICE_NAME_ = string("Focusrite 18i8 2nd");
-    if (!ros::param::get("~pcm_name", pcm_name_))
-        pcm_name_ = string("hw:0,0");
+    if (!ros::param::get("~pcm_id", pcm_id_)){
+        // pcm_id_ = string("hw:0,0");
+        ROS_ERROR(PCM_ERR_MSG.c_str());
+        ros::shutdown();
+    }
     if (!ros::param::get("~pcm_frames", tmp))
         pcm_frames_ = 100;
     else pcm_frames_ = tmp;
@@ -96,10 +100,11 @@ RecorderNode::RecorderNode() {
     // Set the parameter of recorder and check if the command succeeded
     bool enable_recorder = setRecorderParams();
     if(enable_recorder == false){
-        ROS_ERROR("ROS shutdown");
+        ROS_ERROR("Set recorder params failed.");
         ros::shutdown();
-    }
-    cout << COLOR_GREEN << DEVICE_NAME_ << " is ready, wait for subscribing." << COLOR_NC << endl;
+    } else
+        cout << COLOR_GREEN << "Set recorder params sucessfully. " << COLOR_NC << endl;
+    cout << COLOR_GREEN << DEVICE_NAME_ << " is ready, wait for message subscribing." << COLOR_NC << endl;
 }
 
 
@@ -117,11 +122,11 @@ RecorderNode::~RecorderNode() {
 bool RecorderNode::setRecorderParams(void) {
     int rc;
     /* Open PCM device for recording. */
-    rc = snd_pcm_open(&pcm_handle_, pcm_name_.c_str(), SND_PCM_STREAM_CAPTURE, 0);
+    rc = snd_pcm_open(&pcm_handle_, pcm_id_.c_str(), SND_PCM_STREAM_CAPTURE, 0);
     if (rc < 0){
-        cout << "Can not open record device: " << pcm_name_ << endl;
+        cout << "Can not open record device: " << pcm_id_ << endl;
     }else
-        cout << "Open device sucessfully: " << pcm_name_ << endl;
+        cout << "Open device sucessfully: " << pcm_id_ << endl;
   
     /* Allcoate a hardware params object. */ 
     snd_pcm_hw_params_alloca(&pcm_params_);
@@ -151,8 +156,7 @@ bool RecorderNode::setRecorderParams(void) {
         cout << "Unable to set hw params. " << endl;
         return false;
     }
-    else
-        cout << "Set params sucessfully. " << endl;
+    
     
     /* Decide the period size and buffer. */
     snd_pcm_hw_params_get_period_size(pcm_params_, &pcm_frames_, &pcm_dir_);
@@ -176,14 +180,12 @@ void RecorderNode::capture(void) {
     }
 
     for(int i = 0; i < pcm_period_size_ - pcm_available_channels_ * 4 + 1; i = i + pcm_available_channels_ * 4){
-        // int sum1 = (unsigned char)pcm_period_buffer_[i]+256*(unsigned char)pcm_period_buffer_[i+1]+256*256*(unsigned char)pcm_period_buffer_[i+2]+256*256*256*(unsigned char)pcm_period_buffer_[i+3];
-        // int sum2 = (unsigned char)pcm_period_buffer_[i+4]+256*(unsigned char)pcm_period_buffer_[i+5]+256*256*(unsigned char)pcm_period_buffer_[i+6]+256*256*256*(unsigned char)pcm_period_buffer_[i+7];
-        // int sum3 = (unsigned char)pcm_period_buffer_[i+8]+256*(unsigned char)pcm_period_buffer_[i+9]+256*256*(unsigned char)pcm_period_buffer_[i+10]+256*256*256*(unsigned char)pcm_period_buffer_[i+11];
-        // int sum4 = (unsigned char)pcm_period_buffer_[i+12]+256*(unsigned char)pcm_period_buffer_[i+13]+256*256*(unsigned char)pcm_period_buffer_[i+14]+256*256*256*(unsigned char)pcm_period_buffer_[i+15];
-        
         // Append data to channel according your pcm_using_channels_
         for(int j = 0; j < pcm_using_channels_; j++){
-            int sum = (pcm_period_buffer_[i+j*4]) | pcm_period_buffer_[i+1+j*4]<<8 | (pcm_period_buffer_[i+2+j*4])<<16 | (pcm_period_buffer_[i+3+j*4])<<24;
+            int sum = (pcm_period_buffer_[i+j*4]) | \
+                    pcm_period_buffer_[i+1+j*4] << 8 | \
+                    pcm_period_buffer_[i+2+j*4] << 16 | \
+                    pcm_period_buffer_[i+3+j*4] << 24;
             switch(j){
                 case 0:
                     sound_msg_.data_ch1.push_back(sum); break;
@@ -208,7 +210,9 @@ void RecorderNode::run(void) {
 
             if(pub_sound_.getNumSubscribers() > 0) {
                 pub_sound_.publish(sound_msg_);
-                ROS_INFO("Published %d samples data.", (int)sound_msg_.length);
+                ROS_INFO("Published %d samples * %d channel data.", \
+                    (int)sound_msg_.length,\
+                    pcm_using_channels_);
             }
 
             sound_msg_.data_ch1.clear();
