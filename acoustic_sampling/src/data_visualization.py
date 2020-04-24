@@ -29,16 +29,6 @@ class Plot2D():
         # Enable antialiasing for prettier plots
         pg.setConfigOptions(antialias=True)
 
-    
-        # self.canvas1 = self.win.addPlot(title="Channel 1", row=1, col=1)
-        # self.canvas2 = self.win.addPlot(title="Channel 2", row=2, col=1)
-        # self.canvas3 = self.win.addPlot(title="Channel 3", row=3, col=1)
-        # self.canvas4 = self.win.addPlot(title="Channel 4", row=4, col=1)
-
-        # self.spectrum1 = self.win.addPlot(title='Spectrum 1', row=1, col=2)
-        # self.spectrum2 = self.win.addPlot(title='Spectrum 2', row=2, col=2)
-        # self.spectrum3 = self.win.addPlot(title='Spectrum 3', row=3, col=2)
-        # self.spectrum4 = self.win.addPlot(title='Spectrum 4', row=4, col=2)
         self.canvas_list = []
         self.canvas_list.append(self.win.addPlot(title="Channel 1", row=1, col=1))
         self.canvas_list.append(self.win.addPlot(title="Channel 2", row=2, col=1))
@@ -103,27 +93,27 @@ class Plot2D():
                 self.spectrum_list[index].setLogMode(x=True, y=False)
 
     def update(self):
-        # if len(self.ch1_data) > 96000:
-        self.trace("ch1", self.t_range, self.ch1_data)
-        self.trace("ch2", self.t_range, self.ch2_data)
-        self.trace("ch3", self.t_range, self.ch3_data)
-        self.trace("ch4", self.t_range, self.ch4_data)
+        if len(self.ch1_data) > 0:
+            # time domain
+            self.trace("ch1", self.t_range, self.ch1_data)
+            self.trace("ch2", self.t_range, self.ch2_data)
+            self.trace("ch3", self.t_range, self.ch3_data)
+            self.trace("ch4", self.t_range, self.ch4_data)
 
-        sp_data1 = fft(np.array(self.ch1_data, dtype='float32'))
-        sp_data1 = np.abs(sp_data1[0:int(self.num_sample / 2)])
-        self.trace("spectrum1", self.f_range, sp_data1)
-        sp_data2 = fft(np.array(self.ch2_data, dtype='float32'))
-        sp_data2 = np.abs(sp_data2[0:int(self.num_sample / 2)])
-        self.trace("spectrum2", self.f_range, sp_data2)
-        sp_data3 = fft(np.array(self.ch3_data, dtype='float32'))
-        sp_data3 = np.abs(sp_data3[0:int(self.num_sample / 2)])
-        self.trace("spectrum3", self.f_range, sp_data3)
-        sp_data4 = fft(np.array(self.ch4_data, dtype='float32'))
-        sp_data4 = np.abs(sp_data4[0:int(self.num_sample / 2)])
-        self.trace("spectrum4", self.f_range, sp_data4)
+            # frequency domain
+            sp_data1 = fft(np.array(self.ch1_data, dtype='float32'))
+            sp_data1 = np.abs(sp_data1[0:int(self.num_sample / 2)])
+            self.trace("spectrum1", self.f_range, sp_data1)
+            sp_data2 = fft(np.array(self.ch2_data, dtype='float32'))
+            sp_data2 = np.abs(sp_data2[0:int(self.num_sample / 2)])
+            self.trace("spectrum2", self.f_range, sp_data2)
+            sp_data3 = fft(np.array(self.ch3_data, dtype='float32'))
+            sp_data3 = np.abs(sp_data3[0:int(self.num_sample / 2)])
+            self.trace("spectrum3", self.f_range, sp_data3)
+            sp_data4 = fft(np.array(self.ch4_data, dtype='float32'))
+            sp_data4 = np.abs(sp_data4[0:int(self.num_sample / 2)])
+            self.trace("spectrum4", self.f_range, sp_data4)
 
-
-        
 
 ## Start Qt event loop unless running in interactive mode or using pyside.
 if __name__ == '__main__':
